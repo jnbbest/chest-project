@@ -1,12 +1,12 @@
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "ChestConfig", menuName = "Chest/ChestConfig")]
+[CreateAssetMenu(fileName = "ChestConfig", menuName = "Game/ChestConfig")]
 public class ChestConfig : ScriptableObject
 {
     public string chestName;
-    public int minCoinsReward;
-    public int maxCoinsReward;
-    public int minGemsReward;
-    public int maxGemsReward;
-    public int unlockTimeInMinutes;
+    public int minCoins;
+    public int maxCoins;
+    public int minGems;
+    public int maxGems;
+    public float unlockTimeMinutes;
 }
