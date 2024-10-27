@@ -3,10 +3,10 @@ using UnityEngine.UI;
 
 public class ChestSlot : MonoBehaviour
 {
+    public Text chestNameText;
     public Text chestStateText;
     public Text timerText;
-    public Button chestButton;
-    public IChest chest;
+    public Chest chest;
 
     void Update()
     {
@@ -22,7 +22,7 @@ public class ChestSlot : MonoBehaviour
         }
     }
 
-    public void AssignChest(IChest newChest)
+    public void AssignChest(Chest newChest)
     {
         chest = newChest;
         UpdateUI();
@@ -32,9 +32,9 @@ public class ChestSlot : MonoBehaviour
     {
         if (chest == null) return;
 
+        chestNameText.text = chest.config.chestName;
         chestStateText.text = chest.State.ToString();
         timerText.gameObject.SetActive(chest.State == ChestState.Unlocking);
-        chestButton.interactable = chest.State == ChestState.Locked || chest.State == ChestState.Unlocking;
     }
 
     public void OnChestClick()

@@ -19,7 +19,7 @@ public class UIManager : MonoBehaviour
     public void LoadChestSlots()
     {
         // Load saved chests and assign them to the UI slots
-        List<IChest> chests;
+        List<Chest> chests;
         int coins, gems;
         SaveSystem.LoadGameData(out chests, out coins, out gems);
 
@@ -43,7 +43,7 @@ public class UIManager : MonoBehaviour
     {
         if (ChestManager.Instance.chests.Count < chestSlots.Length)
         {
-            IChest newChest = ChestManager.Instance.CreateRandomChest();
+            Chest newChest = ChestManager.Instance.CreateRandomChest();
             foreach (ChestSlot slot in chestSlots)
             {
                 if (slot.chest == null)

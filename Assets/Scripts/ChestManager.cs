@@ -4,8 +4,8 @@ using System.Collections.Generic;
 public class ChestManager : MonoBehaviour
 {
     public static ChestManager Instance { get; private set; }
-    public List<IChest> chests = new List<IChest>();
-    private Queue<IChest> chestQueue = new Queue<IChest>();
+    public List<Chest> chests = new List<Chest>();
+    private Queue<Chest> chestQueue = new Queue<Chest>();
     public List<ChestConfig> chestConfigs;
 
     void Awake()
@@ -22,7 +22,7 @@ public class ChestManager : MonoBehaviour
         }
     }
 
-    public void StartUnlocking(IChest chest)
+    public void StartUnlocking(Chest chest)
     {
         if (chests.Exists(c => c.State == ChestState.Unlocking)) chestQueue.Enqueue(chest);
         else chest.StartUnlock();
@@ -34,12 +34,12 @@ public class ChestManager : MonoBehaviour
 
         if (chestQueue.Count > 0)
         {
-            IChest nextChest = chestQueue.Dequeue();
+            Chest nextChest = chestQueue.Dequeue();
             nextChest.StartUnlock();
         }
     }
 
-    public IChest CreateRandomChest()
+    public Chest CreateRandomChest()
     {
         int randomIndex = Random.Range(0, chestConfigs.Count);
         ChestConfig selectedConfig = chestConfigs[randomIndex];

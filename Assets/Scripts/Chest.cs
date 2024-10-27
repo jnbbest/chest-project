@@ -9,18 +9,7 @@ public enum ChestState
     Collected
 }
 
-public interface IChest
-{
-    ChestState State { get; set; }
-    float UnlockEndTime { get; set; }
-    int GetUnlockCost();
-    int GetRemainingMinutes(); 
-    void StartUnlock();
-    void CollectReward();
-    bool IsReadyToCollect();
-}
-
-public class Chest : IChest
+public class Chest
 {
     public ChestConfig config;
     public ChestState State { get; set; }

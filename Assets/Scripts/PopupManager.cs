@@ -6,7 +6,7 @@ public class PopupManager : MonoBehaviour
     public static PopupManager Instance { get; private set; }
     public GameObject unlockPopup;
     public Text costText;
-    private IChest currentChest;
+    private Chest currentChest;
 
     void Awake()
     {
@@ -14,7 +14,7 @@ public class PopupManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    public void ShowImmediateUnlockPopup(IChest chest)
+    public void ShowImmediateUnlockPopup(Chest chest)
     {
         currentChest = chest;
         int unlockCost = chest.GetUnlockCost();
