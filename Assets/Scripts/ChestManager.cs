@@ -4,9 +4,10 @@ using System.Collections.Generic;
 public class ChestManager : MonoBehaviour
 {
     public static ChestManager Instance { get; private set; }
-    public List<Chest> chests = new List<Chest>();
-    private Queue<Chest> chestQueue = new Queue<Chest>();
     public List<ChestConfig> chestConfigs;
+    public List<Chest> chests = new List<Chest>();
+    private LinkedList<Chest> chestQueue = new LinkedList<Chest>();
+    private Chest currentUnlockingChest;
 
     void Awake()
     {
@@ -22,21 +23,46 @@ public class ChestManager : MonoBehaviour
         }
     }
 
-    public void StartUnlocking(Chest chest)
+    public void StartUnlockingChest(Chest chest)
     {
-        if (chests.Exists(c => c.State == ChestState.Unlocking)) chestQueue.Enqueue(chest);
-        else chest.StartUnlock();
+        if (currentUnlockingChest == null)
+        {
+            currentUnlockingChest = chest;
+            chest.StartUnlock();
+        }
+        else
+        {
+            Chest previousChest = new();
+            if (chestQueue.Count > 0)
+                previousChest = chestQueue.Last.Value;
+            else
+                previousChest = currentUnlockingChest;
+
+            chestQueue.AddLast(chest);
+            chest.AddtoQueue(previousChest.UnlockEndTime);
+        }
+    }
+
+    public void OnChestUnlocked(Chest chest)
+    {
+        if (currentUnlockingChest == chest)
+        {
+            currentUnlockingChest = null; // Clear current chest
+
+            // Start the next chest in the queue if available
+            if (chestQueue.Count > 0)
+            {
+                var nextChest = chestQueue.First.Value;
+                chestQueue.RemoveFirst();
+                currentUnlockingChest = nextChest;
+                nextChest.StartUnlock();
+            }
+        }
     }
 
     public void OnChestCollected(ChestSlot slot)
     {
-        if (slot != null) slot.AssignChest(null); // Clear slot if chest was collected
-
-        if (chestQueue.Count > 0)
-        {
-            Chest nextChest = chestQueue.Dequeue();
-            nextChest.StartUnlock();
-        }
+        if (slot != null) slot.AssignChest(null);
     }
 
     public Chest CreateRandomChest()
@@ -51,5 +77,4 @@ public class ChestManager : MonoBehaviour
         };
         return newChest;
     }
-
 }

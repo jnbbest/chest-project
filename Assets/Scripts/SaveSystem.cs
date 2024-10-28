@@ -2,8 +2,15 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class SaveSystem : MonoBehaviour
-{
-    public static void SaveGameData(List<Chest> chests, int coins, int gems)
+{ 
+    public static void LoadGameData(out List<Chest> chests, out int coins, out int gems)
+    {
+        coins = PlayerPrefs.GetInt("Coins", 0);
+        gems = PlayerPrefs.GetInt("Gems", 0);
+
+        chests = new List<Chest>();
+    }
+    /*public static void SaveGameData(List<Chest> chests, int coins, int gems)
     {
         PlayerPrefs.SetInt("Coins", coins);
         PlayerPrefs.SetInt("Gems", gems);
@@ -44,5 +51,5 @@ public class SaveSystem : MonoBehaviour
                 }
             }
         }
-    }
+    }*/
 }

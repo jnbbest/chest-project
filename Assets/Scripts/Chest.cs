@@ -4,6 +4,7 @@ using System;
 public enum ChestState
 {
     Locked,
+    Queue,
     Unlocking,
     Unlocked,
     Collected
@@ -13,29 +14,37 @@ public class Chest
 {
     public ChestConfig config;
     public ChestState State { get; set; }
-    public float UnlockEndTime { get; set; }
+    public DateTime UnlockEndTime { get; set; }
     private int remainingMinutes;
     
     public void StartUnlock()
     {
-        UnlockEndTime = Time.time + config.unlockTimeMinutes * 60;
+        UnlockEndTime = DateTime.Now.AddMinutes(config.unlockTimeMinutes);
         Debug.Log($"Time.time - {Time.time}, UnlockEndTime - {UnlockEndTime}");
         State = ChestState.Unlocking;
+    }
+
+    public void AddtoQueue(DateTime previousUnlockEndTime)
+    {
+        UnlockEndTime = previousUnlockEndTime.AddMinutes(config.unlockTimeMinutes);
+        Debug.Log($"Time.time - {Time.time}, UnlockEndTime - {UnlockEndTime}");
+        State = ChestState.Queue;
     }
     
     public int GetRemainingTime()
     {
         if (State != ChestState.Unlocking) return 0;
-        return (int)(UnlockEndTime - Time.time);
+            return (int)(UnlockEndTime - DateTime.Now).TotalSeconds;
     }
 
     public int GetUnlockCost()
     {
-        int remainingMinutes = Mathf.CeilToInt((UnlockEndTime - Time.time) / 60);
+        int remainingMinutes = Mathf.CeilToInt(((int)(UnlockEndTime - DateTime.Now).TotalMinutes) / 60);
         return Mathf.CeilToInt(remainingMinutes / 10.0f);
     }
 
-    public bool IsReadyToCollect() => Time.time >= UnlockEndTime;
+    // if UnlockEndTime is greater then DateTime.Now it's ready to collect
+    public bool IsReadyToCollect() => DateTime.Compare(UnlockEndTime, DateTime.Now) >= 0;// => Time.time >= UnlockEndTime;
 
     public void CollectReward()
     {

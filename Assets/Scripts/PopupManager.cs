@@ -7,6 +7,7 @@ public class PopupManager : MonoBehaviour
     public GameObject unlockPopup;
     public Text costText;
     private Chest currentChest;
+    private ChestSlot currentSlot;
 
     void Awake()
     {
@@ -14,9 +15,10 @@ public class PopupManager : MonoBehaviour
         else Destroy(gameObject);
     }
 
-    public void ShowImmediateUnlockPopup(Chest chest)
+    public void ShowImmediateUnlockPopup(Chest chest, ChestSlot slot)
     {
         currentChest = chest;
+        currentSlot = slot;
         int unlockCost = chest.GetUnlockCost();
         costText.text = $"Unlock immediately for {unlockCost} Gems?";
         unlockPopup.SetActive(true);
@@ -29,7 +31,7 @@ public class PopupManager : MonoBehaviour
         {
             CurrencyManager.Instance.AddGems(-unlockCost);
             currentChest.CollectReward();
-            ChestManager.Instance.OnChestCollected(null);
+            ChestManager.Instance.OnChestCollected(currentSlot);
         }
         unlockPopup.SetActive(false);
     }

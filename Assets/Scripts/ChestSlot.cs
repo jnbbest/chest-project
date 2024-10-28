@@ -16,6 +16,7 @@ public class ChestSlot : MonoBehaviour
             if (remainingSeconds <= 0)
             {
                 chest.State = ChestState.Unlocked;
+                ChestManager.Instance.OnChestUnlocked(chest);
                 UpdateUI();
             }
         }
@@ -42,6 +43,9 @@ public class ChestSlot : MonoBehaviour
                 case ChestState.Locked:
                     chestStateText.text = "Locked";
                     break;
+                case ChestState.Queue:
+                    chestStateText.text = "Queue";
+                    break;
                 case ChestState.Unlocking:
                     chestStateText.text = "Unlocking: " + chest.GetRemainingTime().ToString("mm\\:ss");
                     break;
@@ -61,11 +65,11 @@ public class ChestSlot : MonoBehaviour
 
         if (chest.State == ChestState.Locked)
         {
-            ChestManager.Instance.StartUnlocking(chest);
+            ChestManager.Instance.StartUnlockingChest(chest);
         }
         else if (chest.State == ChestState.Unlocking)
         {
-            PopupManager.Instance.ShowImmediateUnlockPopup(chest);
+            PopupManager.Instance.ShowImmediateUnlockPopup(chest, this);
         }
         else if (chest.State == ChestState.Unlocked)
         {
