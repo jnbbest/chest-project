@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Legend
   m_EditorClassIdentifier: 
   chestName: Legend
-  minCoins: 0
-  maxCoins: 0
-  minGems: 0
-  maxGems: 0
-  unlockTimeMinutes: 0
+  minCoins: 1000
+  maxCoins: 1200
+  minGems: 80
+  maxGems: 100
+  unlockTimeMinutes: 0.1

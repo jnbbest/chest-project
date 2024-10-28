@@ -5,7 +5,7 @@ public enum ChestState
 {
     Locked,
     Unlocking,
-    UnlockedButNotCollected,
+    Unlocked,
     Collected
 }
 
@@ -19,18 +19,19 @@ public class Chest
     public void StartUnlock()
     {
         UnlockEndTime = Time.time + config.unlockTimeMinutes * 60;
+        Debug.Log($"Time.time - {Time.time}, UnlockEndTime - {UnlockEndTime}");
         State = ChestState.Unlocking;
     }
     
-    public int GetRemainingMinutes()
+    public int GetRemainingTime()
     {
         if (State != ChestState.Unlocking) return 0;
-        return Mathf.CeilToInt((UnlockEndTime - Time.time) / 60);
+        return (int)(UnlockEndTime - Time.time);
     }
 
     public int GetUnlockCost()
     {
-        int remainingMinutes = GetRemainingMinutes();
+        int remainingMinutes = Mathf.CeilToInt((UnlockEndTime - Time.time) / 60);
         return Mathf.CeilToInt(remainingMinutes / 10.0f);
     }
 

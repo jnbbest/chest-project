@@ -41,8 +41,8 @@ public class ChestManager : MonoBehaviour
 
     public Chest CreateRandomChest()
     {
-        int randomIndex = Random.Range(0, chestConfigs.Count);
-        ChestConfig selectedConfig = chestConfigs[randomIndex];
+        int randomIndex = Random.Range(0, (chestConfigs.Count-1) * 10);
+        ChestConfig selectedConfig = chestConfigs[randomIndex / 10];
 
         Chest newChest = new Chest
         {

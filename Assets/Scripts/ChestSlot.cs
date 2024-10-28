@@ -5,18 +5,17 @@ public class ChestSlot : MonoBehaviour
 {
     public Text chestNameText;
     public Text chestStateText;
-    public Text timerText;
     public Chest chest;
 
     void Update()
     {
         if (chest != null && chest.State == ChestState.Unlocking)
         {
-            int remainingMinutes = chest.GetRemainingMinutes();
-            timerText.text = $"Unlocking in: {remainingMinutes} min";
-            if (remainingMinutes <= 0)
+            int remainingSeconds = chest.GetRemainingTime();
+            chestStateText.text = "Unlocking: " + $"{((int)remainingSeconds / 60)} : {((int)remainingSeconds % 60)} min";
+            if (remainingSeconds <= 0)
             {
-                chest.State = ChestState.UnlockedButNotCollected;
+                chest.State = ChestState.Unlocked;
                 UpdateUI();
             }
         }
@@ -30,11 +29,30 @@ public class ChestSlot : MonoBehaviour
 
     public void UpdateUI()
     {
-        if (chest == null) return;
-
-        chestNameText.text = chest.config.chestName;
-        chestStateText.text = chest.State.ToString();
-        timerText.gameObject.SetActive(chest.State == ChestState.Unlocking);
+        if (chest == null)
+        {
+            chestNameText.text = "";
+            chestStateText.text = "Empty Slot";
+        }
+        else
+        {
+            chestNameText.text = chest.config.chestName;
+            switch (chest.State)
+            {
+                case ChestState.Locked:
+                    chestStateText.text = "Locked";
+                    break;
+                case ChestState.Unlocking:
+                    chestStateText.text = "Unlocking: " + chest.GetRemainingTime().ToString("mm\\:ss");
+                    break;
+                case ChestState.Unlocked:
+                    chestStateText.text = "Tap to Collect!";
+                    break;
+                case ChestState.Collected:
+                    chestStateText.text = "Collected";
+                    break;
+            }
+        }
     }
 
     public void OnChestClick()
@@ -49,7 +67,7 @@ public class ChestSlot : MonoBehaviour
         {
             PopupManager.Instance.ShowImmediateUnlockPopup(chest);
         }
-        else if (chest.State == ChestState.UnlockedButNotCollected)
+        else if (chest.State == ChestState.Unlocked)
         {
             chest.CollectReward();
             ChestManager.Instance.OnChestCollected(this);
