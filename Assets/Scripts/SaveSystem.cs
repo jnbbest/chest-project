@@ -1,55 +1,140 @@
+using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
+using UnityEngine.Events;
 
-public class SaveSystem : MonoBehaviour
-{ 
-    public static void LoadGameData(out List<Chest> chests, out int coins, out int gems)
+[System.Serializable]
+public class ChestData
+{
+    public string configName;
+    public ChestState state;
+    public long unlockEndTimeTicks;
+}
+
+[System.Serializable]
+public class PlayerData
+{
+    public int coins;
+    public int gems;
+    public ChestData currentUnlockingChest;
+    public List<ChestData> chestQueue = new List<ChestData>();
+    public List<ChestData> chests = new List<ChestData>();
+}
+
+public class SaveSystem
+{
+    private static string savePath => Application.persistentDataPath + "/playerdata.json";
+    private static PlayerData playerData = new PlayerData
     {
-        coins = PlayerPrefs.GetInt("Coins", 0);
-        gems = PlayerPrefs.GetInt("Gems", 0);
-
-        chests = new List<Chest>();
+        coins = 0,
+        gems = 0,
+        currentUnlockingChest = null,
+        chestQueue = new (),
+        chests = new ()
+    };
+    
+    // Save to file
+    private static void Save()
+    {
+        string jsonData = JsonUtility.ToJson(playerData);
+        File.WriteAllText(savePath, jsonData);
+        Debug.Log("Game Saved: " + jsonData);
     }
-    /*public static void SaveGameData(List<Chest> chests, int coins, int gems)
+    
+    public static void SaveCurrency(int coins, int gems)
     {
-        PlayerPrefs.SetInt("Coins", coins);
-        PlayerPrefs.SetInt("Gems", gems);
+        playerData.coins = coins;
+        playerData.gems = gems;
+        Save();
+    }
 
-        for (int i = 0; i < chests.Count; i++)
+    public static void SaveChestData(Chest currentUnlockingChest, LinkedList<Chest> chestQueue, List<Chest> chests)
+    {
+        playerData.currentUnlockingChest = currentUnlockingChest != null ? SerializeChest(currentUnlockingChest) : null;
+        playerData.chestQueue = SerializeChestList(new List<Chest>(chestQueue));
+        playerData.chests = SerializeChestList(chests);
+        Save();
+    }
+
+    private static void Load()
+    {
+        if (!File.Exists(savePath))
         {
-            PlayerPrefs.SetInt($"Chest{i}_State", (int)chests[i].State);
-            float remainingTime = chests[i].State == ChestState.Unlocking ? chests[i].UnlockEndTime - Time.time : 0;
-            PlayerPrefs.SetFloat($"Chest{i}_RemainingTime", remainingTime);
+            Debug.LogWarning("Save file not found.");
+            return;
         }
 
-        PlayerPrefs.Save();
+        string jsonData = File.ReadAllText(savePath);
+        playerData = JsonUtility.FromJson<PlayerData>(jsonData);
+
+        Debug.Log("Game Loaded: " + jsonData);
     }
 
-    public static void LoadGameData(out List<Chest> chests, out int coins, out int gems)
+    public static void LoadCurrency(UnityAction<int, int> coinsAndGems)// (ref int coins, ref int gems)
     {
-        coins = PlayerPrefs.GetInt("Coins", 0);
-        gems = PlayerPrefs.GetInt("Gems", 0);
+        Load();
+        coinsAndGems(playerData.coins, playerData.gems);
+    }
 
-        chests = new List<Chest>();
-        for (int i = 0; i < 4; i++)
+    public static void LoadChestData(ref Chest currentUnlockingChest, ref LinkedList<Chest> chestQueue, ref List<Chest> chests, List<ChestConfig> chestConfigs)
+    {
+        Load();
+        currentUnlockingChest = DeserializeChest(playerData.currentUnlockingChest, chestConfigs);
+        chestQueue = new LinkedList<Chest>(DeserializeChestList(playerData.chestQueue, chestConfigs));
+        chests = DeserializeChestList(playerData.chests, chestConfigs);
+    }
+
+    private static ChestData SerializeChest(Chest chest)
+    {
+        return new ChestData
         {
-            int chestValue = PlayerPrefs.GetInt($"Chest{i}_State", -1);
-            if(chestValue > 0)
-            {
-                ChestState state = (ChestState)chestValue;
-                float remainingTime = PlayerPrefs.GetFloat($"Chest{i}_RemainingTime", -1);
+            configName = chest.config.chestName,
+            state = chest.State,
+            unlockEndTimeTicks = chest.UnlockEndTime.Ticks
+        };
+    }
 
-                if (state != ChestState.Collected)
-                {
-                    Chest chest = new Chest(); // Assuming the config is assigned appropriately
-                    chest.State = state;
-                    if (state == ChestState.Unlocking && remainingTime > 0)
-                    {
-                        chest.UnlockEndTime = Time.time + remainingTime;
-                    }
-                    chests.Add(chest);
-                }
+    private static List<ChestData> SerializeChestList(List<Chest> chestList)
+    {
+        List<ChestData> serializedChests = new List<ChestData>();
+        foreach (var chest in chestList)
+        {
+            serializedChests.Add(SerializeChest(chest));
+        }
+        return serializedChests;
+    }
+
+    private static Chest DeserializeChest(ChestData chestData, List<ChestConfig> chestConfigs)
+    {
+        if (chestData == null) return null;
+
+        ChestConfig config = chestConfigs.Find(cfg => cfg.chestName == chestData.configName);
+        if (config == null)
+        {
+            Debug.LogWarning($"Chest config '{chestData.configName}' not found.");
+            return null;
+        }
+
+        return new Chest
+        {
+            config = config,
+            State = chestData.state,
+            UnlockEndTime = new DateTime(chestData.unlockEndTimeTicks)
+        };
+    }
+
+    private static List<Chest> DeserializeChestList(List<ChestData> chestDataList, List<ChestConfig> chestConfigs)
+    {
+        List<Chest> deserializedChests = new List<Chest>();
+        foreach (var chestData in chestDataList)
+        {
+            Chest chest = DeserializeChest(chestData, chestConfigs);
+            if (chest != null)
+            {
+                deserializedChests.Add(chest);
             }
         }
-    }*/
+        return deserializedChests;
+    }
 }

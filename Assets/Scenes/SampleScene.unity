@@ -1299,7 +1299,6 @@ GameObject:
   - component: {fileID: 802907539}
   - component: {fileID: 802907538}
   - component: {fileID: 802907537}
-  - component: {fileID: 802907536}
   - component: {fileID: 802907535}
   m_Layer: 0
   m_Name: GameManager
@@ -1327,18 +1326,6 @@ MonoBehaviour:
   - {fileID: 2065635407}
   coinsText: {fileID: 206124831}
   gemsText: {fileID: 1292135005}
---- !u!114 &802907536
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 802907534}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 41c7215001489b04eb67404acee59c67, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &802907537
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1351,7 +1338,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 57e71b3fb3f35d544b24a9807f6bb9ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uiManager: {fileID: 0}
+  uiManager: {fileID: 802907535}
 --- !u!114 &802907538
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1369,6 +1356,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: af3b069e19426a84d93352d98b1cb4ea, type: 2}
   - {fileID: 11400000, guid: 9255b9620758045489a5530ca77f1be4, type: 2}
   - {fileID: 11400000, guid: 9d0acd9a0d7222c4d841f22bbcc22296, type: 2}
+  chests: []
 --- !u!4 &802907539
 Transform:
   m_ObjectHideFlags: 0
