@@ -10,12 +10,12 @@ public enum ChestState
     Collected
 }
 
+[System.Serializable]
 public class Chest
 {
     public ChestConfig config;
     public ChestState State { get; set; }
     public DateTime UnlockEndTime { get; set; }
-    private int remainingMinutes;
     
     public void StartUnlock()
     {

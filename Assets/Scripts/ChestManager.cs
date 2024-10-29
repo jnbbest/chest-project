@@ -13,13 +13,25 @@ public class ChestManager : MonoBehaviour
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+
+        LoadChestSlots();
     }
 
-    public void GenerateChest()
+    public void LoadChestSlots()
     {
-        if (chests.Count < 4) {
-            var newChest = CreateRandomChest();
-            chests.Add(newChest);
+        SaveSystem.LoadChestData(ref currentUnlockingChest, ref chestQueue, ref chests, chestConfigs);
+
+        UIManager uim = GetComponent<UIManager>();
+        for (int i = 0; i < uim.chestSlots.Length; i++)
+        {
+            if (i < chests.Count && chests[i] != null)
+            {
+                uim.chestSlots[i].AssignChest(chests[i]);
+            }
+            else
+            {
+                uim.chestSlots[i].AssignChest(null); // Clear any leftover slots
+            }
         }
     }
 
@@ -41,6 +53,7 @@ public class ChestManager : MonoBehaviour
             chestQueue.AddLast(chest);
             chest.AddtoQueue(previousChest.UnlockEndTime);
         }
+        SaveChestData();
     }
 
     public void OnChestUnlocked(Chest chest)
@@ -58,23 +71,31 @@ public class ChestManager : MonoBehaviour
                 nextChest.StartUnlock();
             }
         }
-    }
-
-    public void OnChestCollected(ChestSlot slot)
-    {
-        if (slot != null) slot.AssignChest(null);
+        SaveChestData();
     }
 
     public Chest CreateRandomChest()
     {
-        int randomIndex = Random.Range(0, (chestConfigs.Count-1) * 10);
-        ChestConfig selectedConfig = chestConfigs[randomIndex / 10];
-
-        Chest newChest = new Chest
+        if (chests.Count < 4) 
         {
-            config = selectedConfig,
-            State = ChestState.Locked
-        };
-        return newChest;
+            int randomIndex = Random.Range(0, (chestConfigs.Count-1) * 10);
+            ChestConfig selectedConfig = chestConfigs[randomIndex / 10];
+
+            Chest newChest = new Chest
+            {
+                config = selectedConfig,
+                State = ChestState.Locked
+            };
+            chests.Add(newChest);
+
+            SaveChestData();
+            return newChest;
+        }
+        return null;
+    }
+
+    void SaveChestData()
+    {
+        SaveSystem.SaveChestData(currentUnlockingChest, chestQueue, chests);
     }
 }

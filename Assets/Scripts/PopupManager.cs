@@ -31,7 +31,7 @@ public class PopupManager : MonoBehaviour
         {
             CurrencyManager.Instance.AddGems(-unlockCost);
             currentChest.CollectReward();
-            ChestManager.Instance.OnChestCollected(currentSlot);
+            if(currentSlot != null) currentSlot.AssignChest(null);;
         }
         unlockPopup.SetActive(false);
     }

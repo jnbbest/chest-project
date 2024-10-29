@@ -5,7 +5,7 @@ public class ChestSlot : MonoBehaviour
 {
     public Text chestNameText;
     public Text chestStateText;
-    public Chest chest;
+    public Chest chest = null;
 
     void Update()
     {
@@ -74,7 +74,7 @@ public class ChestSlot : MonoBehaviour
         else if (chest.State == ChestState.Unlocked)
         {
             chest.CollectReward();
-            ChestManager.Instance.OnChestCollected(this);
+            AssignChest(null);
         }
         
         UpdateUI();

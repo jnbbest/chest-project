@@ -12,18 +12,27 @@ public class CurrencyManager : MonoBehaviour
         uiManager = GetComponent<UIManager>();
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+
+        LoadCurrency();
+    }
+
+    public void LoadCurrency()
+    {
+        SaveSystem.LoadCurrency((coins, gems) => {Coins = coins; Gems = gems;});
     }
 
     public void AddCoins(int amount)
     {
         Coins += amount;
-        uiManager.UpdateCurrencyUI();
+        uiManager.UpdateCurrencyUI(); 
+        SaveSystem.SaveCurrency(Coins,Gems);
     }
 
     public void AddGems(int amount)
     {
         Gems += amount;
         uiManager.UpdateCurrencyUI();
+        SaveSystem.SaveCurrency(Coins,Gems);
     }
 
     public bool SpendGems(int amount)
@@ -34,6 +43,7 @@ public class CurrencyManager : MonoBehaviour
             uiManager.UpdateCurrencyUI();
             return true; 
         }
+        SaveSystem.SaveCurrency(Coins,Gems);
         return false; 
     }
 }
