@@ -14,8 +14,8 @@ public enum ChestState
 public class Chest
 {
     public ChestConfig config;
-    public ChestState State { get; set; }
-    public DateTime UnlockEndTime { get; set; }
+    public ChestState State;
+    public DateTime UnlockEndTime;
     
     public void StartUnlock()
     {
